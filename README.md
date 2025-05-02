@@ -1,4 +1,4 @@
-#  app
+#  TODOアプリを制作
 
 ## Run the app
 
