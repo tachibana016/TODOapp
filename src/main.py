@@ -97,7 +97,7 @@ def todo_screen(page: ft.Page):
     todos = load_todos()
     todo_view = ft.Column(
         spacing=10,
-        height=300,
+        height=350,
         width=400,
         scroll=ft.ScrollMode.ALWAYS,
     )
