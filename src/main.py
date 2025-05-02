@@ -23,7 +23,7 @@ def main(page: ft.Page):
     page.title = "TODOアプリ"
     
     # 位置(TOP)
-    page.window.top = 20  
+    page.window.top = 30  
 
     # 位置(LEFT)
     page.window.left = 100  
