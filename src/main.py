@@ -26,7 +26,7 @@ def main(page: ft.Page):
     page.window.top = 30  
 
     # 位置(LEFT)
-    page.window.left = 100  
+    page.window.left = 30  
 
     # 幅
     page.window.width = 500
