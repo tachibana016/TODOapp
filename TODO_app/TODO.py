@@ -5,11 +5,6 @@ import threading
 import os
 import json
 
-# TODOリストを保存する関数
-def save_todos(todos):
-    with open("todo.json", "w", encoding="utf-8") as f:
-        json.dump(todos, f, ensure_ascii=False, indent=4)
-
 # TODOリストを読み込む関数
 def load_todos():
     if os.path.exists("todo.json"):
@@ -17,23 +12,32 @@ def load_todos():
             return json.load(f)
     return []
 
+# TODOリストを保存する関数
+def save_todos(todos):
+    with open("todo.json", "w", encoding="utf-8") as f:
+        json.dump(todos, f, ensure_ascii=False, indent=4)
+
+def save_completed(todos):
+    completed = [todo for todo in todos if todo['completed']]
+    with open("completed.json", "w", encoding="utf-8") as f:
+        json.dump(completed, f, ensure_ascii=False, indent=4)
+
+# JSONファイルをクリアする関数
+def clear_completed():
+    with open("completed.json", "w", encoding="utf-8") as f:
+        f.write("[]")  # 空のリストで初期化
+
 def main(page: ft.Page):
     # ページタイトル
     page.title = "TODOアプリ"
     
-    # 位置(TOP)
+    # ウィンドウ設定
     page.window.top = 30  
-    # 位置(LEFT)
     page.window.left = 100  
-    # 幅
     page.window.width = 500
-    # 高さ
     page.window.height = 700  
-    # 最小化ボタンを消す
     page.window.minimizable = False 
-    # 最大化ボタンを消す
     page.window.maximizable = False
-    # ウィンドウサイズ変更可否　
     page.window.resizable = False
     
     # ナビゲーションバーでの画面遷移
@@ -41,7 +45,7 @@ def main(page: ft.Page):
         if e.control.selected_index == 0:
             go_to_page(page,"todo")
         elif e.control.selected_index == 1:
-            go_to_page(page,"task")
+            go_to_page(page,"achievements")
         elif e.control.selected_index == 2:
             go_to_page(page,"settings")
         page.update()
@@ -49,7 +53,7 @@ def main(page: ft.Page):
     page.navigation_bar = ft.NavigationBar(
         destinations = [
             ft.NavigationBarDestination(icon = ft.Icons.CHECK_BOX, label = "TODO"),
-            ft.NavigationBarDestination(icon = ft.Icons.CALENDAR_MONTH, label = "TASK"),
+            ft.NavigationBarDestination(icon = ft.Icons.CALENDAR_MONTH, label = "ACHIEVEMENTS"),
             ft.NavigationBarDestination(icon = ft.Icons.SETTINGS, label = "SETTING"),
         ],
         on_change = change_screen
@@ -79,6 +83,7 @@ def todo_screen(page: ft.Page):
 
     # TODOリストを読み込む
     todos = load_todos()
+
     todo_view = ft.Column(
         spacing=10,
         height=350,
@@ -93,13 +98,23 @@ def todo_screen(page: ft.Page):
         def edit_todo(e):
             nonlocal editing_index
             editing_index = index  
-            new_todo.value = todo  # 編集用のテキストフィールドに値をセット
+            new_todo.value = todo['text']  # 編集用のテキストフィールドに値をセット
             page.update()
-            update_todo_view() 
+            update_todo_view()  # 表示を更新
 
         def delete_todo(e):
             todos.remove(todo)  # TODOリストから削除
             save_todos(todos)  # 保存
+            update_todo_view()  # 表示を更新
+
+        def toggle_completed(e):
+            todo['completed'] = not todo['completed']  # 完了状態をトグル
+            if todo['completed']:
+                todo['completed_date'] = datetime.now().strftime("%Y-%m-%d")  # 完了日を記録
+            else:
+                todo.pop('completed_date', None)  # 完了日を削除
+            save_todos(todos)  # 現在のTODOリストを保存
+            save_completed(todos)  # 完了したTODOリストを保存
             update_todo_view()  # 表示を更新
 
         # メニュー項目を条件に応じて作成
@@ -111,19 +126,25 @@ def todo_screen(page: ft.Page):
 
         return ft.Row(
             controls=[
-                ft.Checkbox(label=todo),
+                ft.Checkbox(
+                    label=todo['text'],
+                    value=todo['completed'],  # 完了状態をチェックボックスに反映
+                    on_change=toggle_completed  # チェックボックスの状態が変わったときの処理
+                ),
+                
                 ft.PopupMenuButton(
                     items=menu_items,  # 条件に応じたメニュー項目を使用
                 ),
             ],
             alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
         )
-
-    # TODOリストを表示する関数
+    
+    
     def update_todo_view():
         todo_view.controls.clear()
         for index, todo in enumerate(todos):
-            todo_view.controls.append(create_todo_item(todo, index))
+            if not todo['completed']:  # 完了していないTODO項目のみ表示
+                todo_view.controls.append(create_todo_item(todo, index))
         page.update()
 
 
@@ -133,10 +154,10 @@ def todo_screen(page: ft.Page):
         # 入力が空でない場合のみ追加または更新
         if new_todo.value:  
             if editing_index is not None:  # 編集中の場合
-                todos[editing_index] = new_todo.value  # 既存のTODOを更新
+                todos[editing_index]['text'] = new_todo.value  # 既存のTODOを更新
                 editing_index = None  # 編集を終了
             else:  # 新しいTODOを追加
-                todos.append(new_todo.value)
+                todos.append({"text": new_todo.value, "completed": False})  # 完了状態を追加
             save_todos(todos)  # TODOリストを保存
             new_todo.value = ""  # 入力フィールドをクリア
             update_todo_view()  # 表示を更新
@@ -166,19 +187,75 @@ def todo_screen(page: ft.Page):
     # 初期表示の更新
     update_todo_view()
 
-def task_screen(page: ft.Page):
-    page.add()
+def achievements_screen(page: ft.Page):
+
+    # クリアボタンがクリックされたときの処理
+    def clear_button_clicked(e):
+        clear_completed()  # JSONファイルをクリア
+        achievements_view.controls.clear()  # 完了したタスクの表示をクリア
+        update_completed_view()  # 完了したタスクの表示を更新
+
+    def load_completed():
+        if os.path.exists("completed.json"):
+            with open("completed.json", "r", encoding="utf-8") as f:
+                return json.load(f)
+        return []
+    # クリアボタン
+    clear_button = ft.Button("完了したタスクをクリア", on_click=clear_button_clicked)
+
+    achievements_view = ft.Column(
+        spacing=10,
+        height=350,
+        width=400,
+        scroll=ft.ScrollMode.ALWAYS,
+    )
+
+    completed_view = ft.Column(
+        controls=[
+            clock_text,
+            calendar_text,
+            achievements_view,
+            ft.Row(
+                controls=[],
+            ),   
+            clear_button,
+        ],
+        horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+    )
+
+    def update_completed_view():
+        completed = load_completed()  # 完了したTODO項目を再読み込み
+        achievements_view.controls.clear()  # 既存の表示をクリア
+        for todo in completed:
+            completed_date = todo.get('completed_date', '未設定')  # 完了日を取得
+            
+            # 左側にタスク名、右側に完了日を配置するための行を作成
+            row = ft.Row(
+                [
+                    ft.Text(todo['text'], size=20, width=250),  # タスク名
+                    ft.Text(completed_date, size=20, width=120 )  # 完了日
+                ],
+                alignment=ft.MainAxisAlignment.SPACE_BETWEEN,  # 左右にスペースを均等に配置
+                
+            )
+            achievements_view.controls.append(row)  # 行を追加
+        page.update()  # ページを更新
+
+    # ページに追加
+    page.add(completed_view)
+
+    update_completed_view()
 
 def settings_screen(page: ft.Page):
-    page.add()
+    # 設定画面の内容を追加することができます
+    page.add(ft.Text("設定画面", size=30))
 
-# 画面遷移用関数 引数の文字列に対応したページへ遷移
 def go_to_page(page: ft.Page, page_name: str):
     page.clean()  
     if page_name == "todo":
         todo_screen(page)
-    elif page_name == "task":
-        task_screen(page)
+    elif page_name == "achievements":
+        achievements_screen(page)  # 完了したTODO項目を表示する画面
     elif page_name == "settings":
         settings_screen(page)
 

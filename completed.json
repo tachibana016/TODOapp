@@ -50,16 +50,8 @@
         "completed_date": "2025-05-08"
     },
     {
-        "text": "to",
-        "completed": false
-    },
-    {
         "text": "aido",
         "completed": true,
         "completed_date": "2025-05-08"
-    },
-    {
-        "text": "iv",
-        "completed": false
     }
 ]
