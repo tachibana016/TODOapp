@@ -64,7 +64,7 @@ def main(page: ft.Page):
     page.navigation_bar = ft.NavigationBar(
         destinations = [
             ft.NavigationBarDestination(icon = ft.Icons.CHECK_BOX, label = "TODO"),
-            ft.NavigationBarDestination(icon = ft.Icons.CALENDAR_MONTH, label = "ACHIEVEMENTS"),
+            ft.NavigationBarDestination(icon = ft.Icons.STAR, label = "ACHIEVEMENTS"),
             ft.NavigationBarDestination(icon = ft.Icons.SETTINGS, label = "SETTING"),
         ],
         on_change = change_screen
@@ -238,9 +238,7 @@ def todo_screen(page: ft.Page):
     update_todo_view()
 
 # 達成確認画面
-def achievements_screen(page: ft.Page):
-
-    
+def achievements_screen(page: ft.Page):    
 
     def load_completed():
         if os.path.exists("completed.json"):
@@ -307,11 +305,41 @@ def settings_screen(page: ft.Page):
 
         # JSONファイルをクリア
         clear_completed()  
+        page.close(e.control.parent)
+
+    def cancell_button_clicked(e):
+        page.close(e.control.parent)
         
     # クリアボタン
-    clear_button = ft.Button("完了したタスクをクリア", on_click=clear_button_clicked,icon = ft.Icons.CHECK_BOX)
+    clear_button = ft.FilledButton(
+        text="リストの初期化",
+        height=70,
+        on_click=lambda e: page.open(
+            ft.AlertDialog(
+                title=ft.Text("リストの初期化"),
+                content=ft.Text("TODOとACHIEVEMENTSを初期化します。\n復元できません。"),
+                actions=material_actions,
+            )
+        ),
+    )
 
-    page.add(ft.Text("設定画面", size=30),clear_button,)
+    material_actions = [
+        ft.TextButton(text="Yes", on_click=clear_button_clicked),
+        ft.TextButton(text="No",on_click=cancell_button_clicked),
+    ]
+
+    settings_view = ft.Column(
+        controls=[
+            clear_button,
+            ft.Row(
+                controls=[],
+            ),   
+            
+        ],
+        horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+    )        
+    
+    page.add(settings_view)
 
 # 画面遷移
 def go_to_page(page: ft.Page, page_name: str):
