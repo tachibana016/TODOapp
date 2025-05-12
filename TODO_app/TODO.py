@@ -90,14 +90,15 @@ def update_clock():
 
 # TODO画面
 def todo_screen(page: ft.Page):
-    new_todo = ft.TextField(hint_text="TODOリストに追加", expand=True)
-
+    
+    new_todo = ft.TextField(label="TODOリストに追加", max_length=15,expand=True,)
+    
     # TODOリストを読み込む
     todos = load_todos()
 
     todo_view = ft.Column(
         spacing=10,
-        height=350,
+        height=320,
         width=400,
         scroll=ft.ScrollMode.ALWAYS,
     )
@@ -163,7 +164,6 @@ def todo_screen(page: ft.Page):
         return ft.Row(
             controls=[
                 ft.Checkbox(
-                    label=todo['text'],
 
                     # 完了状態をチェックボックスに反映
                     value=todo['completed'],  
@@ -171,6 +171,7 @@ def todo_screen(page: ft.Page):
                     # チェックボックスの状態が変わったときの処理
                     on_change=toggle_completed  
                 ),
+                ft.Text(todo['text'], size=20, ), 
                 
                 ft.PopupMenuButton(
 
@@ -179,6 +180,7 @@ def todo_screen(page: ft.Page):
                 ),
             ],
             alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+            
         )
     
     # リスト更新
@@ -217,7 +219,15 @@ def todo_screen(page: ft.Page):
         controls=[
             clock_text,
             calendar_text,
-            todo_view,
+            ft.Card(
+                content=ft.Container(
+                    content=ft.Column(
+                        [
+                            ft.ListTile(todo_view)
+                        ]
+                    )
+                )  
+            ),            
             ft.Row(
                 controls=[
                     new_todo,
@@ -249,7 +259,7 @@ def achievements_screen(page: ft.Page):
     
     achievements_view = ft.Column(
         spacing=10,
-        height=350,
+        height=400,
         width=400,
         scroll=ft.ScrollMode.ALWAYS,
     )
@@ -258,7 +268,16 @@ def achievements_screen(page: ft.Page):
         controls=[
             clock_text,
             calendar_text,
-            achievements_view,
+            ft.Card(
+                content=ft.Container(
+                    content=ft.Column(
+                        [
+                            ft.ListTile(achievements_view)
+                        ]
+                    )
+                )
+            ),            
+            
             ft.Row(
                 controls=[],
             ),   
@@ -282,10 +301,10 @@ def achievements_screen(page: ft.Page):
             row = ft.Row(
                 [
                     # タスク名
-                    ft.Text(todo['text'], size=20, width=250),  
+                    ft.Text(todo['text'], size=20,),  
 
                     # 完了日
-                    ft.Text(completed_date, size=20, width=120 )  
+                    ft.Text(completed_date, size=20)  
                 ],
                 alignment=ft.MainAxisAlignment.SPACE_BETWEEN,  
                 
@@ -310,27 +329,94 @@ def settings_screen(page: ft.Page):
     def cancell_button_clicked(e):
         page.close(e.control.parent)
         
-    # クリアボタン
-    clear_button = ft.FilledButton(
-        text="リストの初期化",
-        height=70,
-        on_click=lambda e: page.open(
+    # リストクリア選択時処理
+    def clear_chois(e):
+        page.open(
             ft.AlertDialog(
                 title=ft.Text("リストの初期化"),
                 content=ft.Text("TODOとACHIEVEMENTSを初期化します。\n復元できません。"),
                 actions=material_actions,
             )
         ),
-    )
+
 
     material_actions = [
         ft.TextButton(text="Yes", on_click=clear_button_clicked),
         ft.TextButton(text="No",on_click=cancell_button_clicked),
     ]
 
+    settings_list = ft.Card(
+            content=ft.Container(
+                width=500,
+                content=ft.Column(
+                    [
+                        ft.ListTile(
+                            title=ft.Text("設定",size=20),
+                        ),
+                        ft.ListTile(
+                            title=ft.Text("リストの初期化",size=15), dense=True,
+                            subtitle=ft.Row(
+                                [ft.TextButton("execution",on_click=clear_chois)],
+                                alignment=ft.MainAxisAlignment.END,
+                            ),
+                        ),
+                        ft.ListTile(
+                            leading=ft.Icon(ft.Icons.SETTINGS),
+                            title=ft.Text("One-line selected list tile"),
+                            selected=True,
+                        ),
+                        ft.ListTile(
+                            leading=ft.Image(src="/icons/icon-192.png", fit="contain"),
+                            title=ft.Text("One-line with leading control"),
+                        ),
+                        ft.ListTile(
+                            title=ft.Text("One-line with trailing control"),
+                            trailing=ft.PopupMenuButton(
+                                icon=ft.Icons.MORE_VERT,
+                                items=[
+                                    ft.PopupMenuItem(text="Item 1"),
+                                    ft.PopupMenuItem(text="Item 2"),
+                                ],
+                            ),
+                        ),
+                        ft.ListTile(
+                            leading=ft.Icon(ft.Icons.ALBUM),
+                            title=ft.Text(
+                                "One-line with leading and trailing controls"
+                            ),
+                            trailing=ft.PopupMenuButton(
+                                icon=ft.Icons.MORE_VERT,
+                                items=[
+                                    ft.PopupMenuItem(text="Item 1"),
+                                    ft.PopupMenuItem(text="Item 2"),
+                                ],
+                            ),
+                        ),
+                        ft.ListTile(
+                            leading=ft.Icon(ft.Icons.SNOOZE),
+                            title=ft.Text(
+                                "Two-line with leading and trailing controls"
+                            ),
+                            subtitle=ft.Text("Here is a second title."),
+                            trailing=ft.PopupMenuButton(
+                                icon=ft.Icons.MORE_VERT,
+                                items=[
+                                    ft.PopupMenuItem(text="Item 1"),
+                                    ft.PopupMenuItem(text="Item 2"),
+                                ],
+                            ),
+                        ),
+                    ],
+                    spacing=0,
+                ),
+                padding=ft.padding.symmetric(vertical=10),
+            )
+        )
+
     settings_view = ft.Column(
         controls=[
-            clear_button,
+            
+            settings_list,
             ft.Row(
                 controls=[],
             ),   
