@@ -148,36 +148,36 @@ def todo_screen(page: ft.Page):
         # 削除処理
         def delete_todo(e):
             # TODOリストから削除
-            todos.remove(todo)  
+            todos.remove(todo)
 
             # 保存
-            save_todos(todos)  
+            save_todos(todos)
 
             # 表示を更新
-            update_todo_view()  
+            update_todo_view()
 
         def toggle_completed(e):
 
             # 完了状態を確認
-            todo['completed'] = not todo['completed']  
+            todo['completed'] = not todo['completed']
             if todo['completed']:
                 # 完了日を記録
                 todo['completed_date'] = datetime.now().strftime("%Y-%m-%d")
             else:
                 # 完了日を削除
-                todo.pop('completed_date', None)  
-            
+                todo.pop('completed_date', None)
+
             # 現在のTODOリストを保存
-            save_todos(todos)  
+            save_todos(todos)
 
             # 完了したTODOリストを保存
-            save_completed(todos)  
+            save_completed(todos)
 
         # メニュー項目を条件に応じて作成
         menu_items = [ft.PopupMenuItem(text="編集", on_click=edit_todo)]
 
         # 編集中でない場合のみ削除項目を追加
-        if editing_index is None:  
+        if editing_index is None:
             menu_items.append(ft.PopupMenuItem(text="削除", on_click=delete_todo))
         else:
             menu_items = [ft.PopupMenuItem(text="編集中")]
@@ -187,33 +187,32 @@ def todo_screen(page: ft.Page):
                 ft.Checkbox(
 
                     # 完了状態をチェックボックスに反映
-                    value=todo['completed'],  
+                    value=todo['completed'],
 
                     # チェックボックスの状態が変わったときの処理
-                    on_change=toggle_completed, 
+                    on_change=toggle_completed,
                 ),
                 ft.Text(
                     todo['text'],
-                    color=text_color,  
+                    color=text_color,
                     size=text_size,
                     font_family=text_font,
                 ),
                 ft.PopupMenuButton(
                     # 条件に応じたメニュー項目を使用
-                    items=menu_items, 
+                    items=menu_items,
                 ),
             ],
             alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
-            
         )
-    
+
     # リスト更新
     def update_todo_view():
         todo_list.controls.clear()
 
         # 完了していないTODO項目のみ表示
         for index, todo in enumerate(todos):
-            if not todo['completed']:  
+            if not todo['completed']:
                 todo_list.controls.append(create_todo_item(todo, index))
         page.update()
 
@@ -223,20 +222,20 @@ def todo_screen(page: ft.Page):
         nonlocal editing_index
 
         # 入力が空でない場合のみ追加または更新
-        if new_todo.value:  
+        if new_todo.value:
 
             # 編集中の場合
-            if editing_index is not None: 
+            if editing_index is not None:
                 # 既存のTODOを更新
-                todos[editing_index]['text'] = new_todo.value  
-                editing_index = None  
+                todos[editing_index]['text'] = new_todo.value
+                editing_index = None
 
-            else: 
+            else:
                 # 新しいTODOを追加
-                todos.append({"text": new_todo.value, "completed": False})  
-            save_todos(todos)  
-            new_todo.value = ""  
-            update_todo_view()  
+                todos.append({"text": new_todo.value, "completed": False})
+            save_todos(todos)
+            new_todo.value = ""
+            update_todo_view()
 
     # TODO画面 レイアウト
     todo_view = ft.Column(
@@ -251,13 +250,13 @@ def todo_screen(page: ft.Page):
                             ft.ListTile(todo_list)
                         ]
                     )
-                )  
-            ),            
-            ft.Row(    
+                )
+            ),
+            ft.Row(
                 controls=[
                     new_todo,
                     ft.FloatingActionButton(icon=ft.Icons.ADD, on_click=add_clicked),
-                ],    
+                ],
             ),
         ],
         horizontal_alignment=ft.CrossAxisAlignment.CENTER,
@@ -268,24 +267,23 @@ def todo_screen(page: ft.Page):
 
     # 時計を更新するスレッドを開始
     threading.Thread(target=update_clock, daemon=True).start()
-    
+
     # 初期表示の更新
     update_todo_view()
 
 # 達成確認画面
-def achievements_screen(page: ft.Page): 
+def achievements_screen(page: ft.Page):
 
     global Mainback_color
     global text_color
-    global Cardback_color   
+    global Cardback_color
 
     def load_completed():
         if os.path.exists("completed.json"):
             with open("completed.json", "r", encoding="utf-8") as f:
                 return json.load(f)
         return []
-    
-    
+
     achievements_list = ft.Column(
         spacing=10,
         height=400,
@@ -306,24 +304,24 @@ def achievements_screen(page: ft.Page):
                         ]
                     )
                 )
-            ),            
+            ),
             ft.Row(
                 controls=[],
-            ),   
+            ),
         ],
         horizontal_alignment=ft.CrossAxisAlignment.CENTER,
     )
 
     def update_completed_view():
         # 完了したTODO項目を再読み込み
-        completed = load_completed()  
+        completed = load_completed()
 
         # 既存の表示をクリア
-        achievements_list.controls.clear()  
+        achievements_list.controls.clear()
 
         for todo in completed:
-            completed_date = todo.get('completed_date', '未設定')  
-            
+            completed_date = todo.get('completed_date', '未設定')
+
             # 左側にタスク名、右側に完了日を配置するための行を作成
             row = ft.Row(
                 [
@@ -335,15 +333,14 @@ def achievements_screen(page: ft.Page):
                         color=text_color,
 
                         # オーバーフロー時に省略記号を表示
-                        overflow=ft.TextOverflow.ELLIPSIS,  
-                        
+                        overflow=ft.TextOverflow.ELLIPSIS,
+
                         # 最大行数を設定
-                        max_lines=2,  
+                        max_lines=2,
 
                         # 幅を設定してオーバーフローを発生させる
-                        width=200,  
-                    ),  
-                    
+                        width=200,
+                    ),
                     # 完了日
                     ft.Text(
                         completed_date,
@@ -352,7 +349,6 @@ def achievements_screen(page: ft.Page):
                         color=text_color,
                         width=140,  # 幅を設定してオーバーフローを発生させる
                     ),
-                    
                 ],
                 alignment=ft.MainAxisAlignment.SPACE_AROUND,
             )
@@ -360,7 +356,6 @@ def achievements_screen(page: ft.Page):
         page.update()  # ページを更新
     # ページに追加
     page.add(completed_view)
-
     update_completed_view()
 
 def settings_screen(page: ft.Page):
@@ -373,12 +368,12 @@ def settings_screen(page: ft.Page):
     # クリアボタンがクリックされたときの処理
     def clear_button_clicked(e):
         # JSONファイルをクリア
-        clear_completed()  
+        clear_completed()
         page.close(e.control.parent)
 
     def cancell_button_clicked(e):
         page.close(e.control.parent)
-        
+
     # リストクリア選択時処理
     def clear_chois(e):
         page.open(
@@ -395,7 +390,7 @@ def settings_screen(page: ft.Page):
         global Cardback_color
         global clock_text
         global calendar_text
-        
+
         if Mainback_color == ft.Colors.WHITE :
             Mainback_color = ft.Colors.GREY_900
             Cardback_color = ft.Colors.GREY_700
@@ -416,21 +411,21 @@ def settings_screen(page: ft.Page):
         # ドロップダウンから選択されたサイズを取得
         selected_size = e.control.value
         # 選択されたサイズを整数に変換
-        text_size = int(selected_size)  
+        text_size = int(selected_size)
 
         # ページ全体のテキストサイズを変更
         for control in page.controls:
             if isinstance(control, ft.Text):
                 control.size = text_size
-        page.update()  # ページを更新
-    
+        page.update()
+
     def change_text_font(e):
         global text_font
 
         # ドロップダウンから選択されたサイズを取得
         selected_font = e.control.value
         # 選択されたサイズを整数に変換
-        text_font = selected_font  
+        text_font = selected_font
 
         # ページ全体のテキストサイズを変更
         for control in page.controls:
@@ -458,7 +453,7 @@ def settings_screen(page: ft.Page):
             ft.dropdown.Option("22", "22"),
             ft.dropdown.Option("24", "24"),
         ],
-        on_change=change_text_size,  
+        on_change=change_text_size,
     )
 
     # テキストサイズ変更用のドロップダウン
@@ -473,7 +468,7 @@ def settings_screen(page: ft.Page):
             ft.dropdown.Option("MS Gothic", "MS Gothic"),
             ft.dropdown.Option("MS Mincho", "MS Mincho"),
         ],
-        on_change=change_text_font,  
+        on_change=change_text_font,
     )
 
     material_actions = [
@@ -541,7 +536,7 @@ def settings_screen(page: ft.Page):
                         ),
                     ),
                     ft.Divider(height=20),
-                ],  
+                ],
             ),
         )
 
@@ -551,20 +546,17 @@ def settings_screen(page: ft.Page):
             settings_list,
         ],
     )
-    
-    page.add(settings_view)
 
-    
+    page.add(settings_view)
 
 # 画面遷移
 def go_to_page(page: ft.Page, page_name: str):
-    page.clean()  
+    page.clean()
     if page_name == "todo":
         todo_screen(page)
     elif page_name == "achievements":
-        achievements_screen(page)  
+        achievements_screen(page)
     elif page_name == "settings":
         settings_screen(page)
 
 ft.app(main)
-
