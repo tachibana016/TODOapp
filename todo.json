@@ -1,1 +1,73 @@
-[]
+[
+    {
+        "text": "掃除",
+        "completed": true,
+        "completed_date": "2025-05-20"
+    },
+    {
+        "text": "洗濯",
+        "completed": true,
+        "completed_date": "2025-05-20"
+    },
+    {
+        "text": "qww",
+        "completed": true,
+        "completed_date": "2025-05-22"
+    },
+    {
+        "text": "iiii",
+        "completed": false
+    },
+    {
+        "text": "mo",
+        "completed": true,
+        "completed_date": "2025-05-22"
+    },
+    {
+        "text": "ni",
+        "completed": true,
+        "completed_date": "2025-05-22"
+    },
+    {
+        "text": "yuyuyu",
+        "completed": true,
+        "completed_date": "2025-05-22"
+    },
+    {
+        "text": "bi",
+        "completed": false
+    },
+    {
+        "text": "ware",
+        "completed": true,
+        "completed_date": "2025-05-22"
+    },
+    {
+        "text": "ところがぎっちょん",
+        "completed": true,
+        "completed_date": "2025-05-22"
+    },
+    {
+        "text": "同じ穴の狢がよ",
+        "completed": true,
+        "completed_date": "2025-05-22"
+    },
+    {
+        "text": "戦争根絶を願ったテロリストどもが",
+        "completed": true,
+        "completed_date": "2025-05-22"
+    },
+    {
+        "text": "ni",
+        "completed": false
+    },
+    {
+        "text": "hi",
+        "completed": false
+    },
+    {
+        "text": "nifnifsf",
+        "completed": true,
+        "completed_date": "2025-05-23"
+    }
+]
