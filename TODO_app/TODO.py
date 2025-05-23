@@ -3,24 +3,32 @@ from datetime import datetime
 import time
 from utils import load_todos,save_todos,save_completed
 
-def todo_screen(page: ft.Page,settings):
+# FletのPageオブジェクトと設定オブジェクトを受け取り
+def todo_screen(page: ft.Page,app_setting):
 
-    settings.start_clock_thread()
+    # 時計とカレンダーの設定
+    clock = ft.Text("", size=50, weight=ft.FontWeight.BOLD,color=ft.Colors.BLUE_GREY_600,font_family="Kanit")
+    calendar = ft.Text("", size=30, weight=ft.FontWeight.BOLD,color=ft.Colors.BLUE_GREY_600,font_family="Consolas")
 
-    clock = ft.Text("", size=50, color=settings.text_color, font_family=settings.text_font)
-    calendar = ft.Text("", size=30, color=settings.text_color, font_family=settings.text_font)
+    # app_settingから
+    app_setting.clock_text = clock
+    app_setting.calendar_text = calendar
 
-    settings.clock_text = clock
-    settings.calendar_text = calendar
-
-
+    # TODOリストに追加用のテキストフィールド
     new_todo = ft.TextField(
         hint_text="TODOリストに追加",
+        color=app_setting.text_color,
+        expand=True,
+        bgcolor=app_setting.card_bg_color,
+        border_color=app_setting.text_color,
+        cursor_color=app_setting.text_color,
     )
+
 
     # TODOリストを読み込む
     todos = load_todos()
 
+    # TODOリスト用レイアウト
     todo_list = ft.Column(
         spacing=10,
         height=320,
@@ -31,6 +39,7 @@ def todo_screen(page: ft.Page,settings):
     # 現在編集中のTODO項目を追跡するための変数
     editing_index = None
 
+    # TODOリストの編集、削除処理用レイアウト
     def create_todo_item(todo, index):
         # 編集処理
         def edit_todo(e):
@@ -39,7 +48,6 @@ def todo_screen(page: ft.Page,settings):
 
             # 編集用のテキストフィールドに値をセット
             new_todo.value = todo['text']
-
             update_todo_view()
 
         # 削除処理
@@ -49,17 +57,16 @@ def todo_screen(page: ft.Page,settings):
 
             # 保存
             save_todos(todos)
-
-            # 表示を更新
             update_todo_view()
 
-        def toggle_completed(e):
+        # チェックされたときの処理
+        def check_completed(e):
 
             # 完了状態を確認
             todo['completed'] = not todo['completed']
             if todo['completed']:
                 # 完了日を記録
-                todo['completed_date'] = datetime.now().strftime("%Y-%m-%d")
+                todo['completed_date'] = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
             else:
                 # 完了日を削除
                 todo.pop('completed_date', None)
@@ -87,13 +94,13 @@ def todo_screen(page: ft.Page,settings):
                     value=todo['completed'],
 
                     # チェックボックスの状態が変わったときの処理
-                    on_change=toggle_completed,
+                    on_change=check_completed,
                 ),
                 ft.Text(
                     todo['text'],
-                    size=settings.text_size,
-                    color=settings.text_color,
-                    font_family=settings.text_font
+                    size=app_setting.text_size,
+                    color=app_setting.text_color,
+                    font_family=app_setting.text_font
                 ),
                 ft.PopupMenuButton(
                     # 条件に応じたメニュー項目を使用
@@ -105,6 +112,7 @@ def todo_screen(page: ft.Page,settings):
 
     # リスト更新
     def update_todo_view():
+
         todo_list.controls.clear()
 
         # 完了していないTODO項目のみ表示
@@ -115,7 +123,7 @@ def todo_screen(page: ft.Page,settings):
         page.update()
 
 
-    # クリック時処理 ラベルの追加と画面更新
+    # クリック時、ラベルの追加と画面更新
     def add_clicked(e):
         nonlocal editing_index
 
@@ -135,11 +143,11 @@ def todo_screen(page: ft.Page,settings):
             new_todo.value = ""
             update_todo_view()
 
-    # TODO画面 レイアウト
+    # TODO画面レイアウト
     todo_view = ft.Column(
         controls=[
             ft.Card(
-                color=settings.card_bg_color,
+                color=app_setting.card_bg_color,
                 content=ft.Container(
                     content=ft.Column(
                         [
@@ -153,13 +161,16 @@ def todo_screen(page: ft.Page,settings):
                     new_todo,
                     ft.FloatingActionButton(icon=ft.Icons.ADD, on_click=add_clicked),
                 ],
+                alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
             ),
         ],
     )
     # 初期表示更新
     update_todo_view()
-    settings.start_clock_thread()
+    app_setting.start_clock_thread()
+    app_setting.save()
 
+    # レイアウトを返す
     return ft.Column(
         [
             clock,

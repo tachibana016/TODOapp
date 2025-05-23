@@ -1,11 +1,11 @@
 import flet as ft
 from todo import todo_screen
-from achievements import achievements_screen
+from achievement import achievement_screen
 from setting import setting_screen
-from app_setting import AppSettings
+from app_setting import App_Setting
 
 def main(page: ft.Page):
-    settings = AppSettings()
+    app_setting = App_Setting()
 
     # ページタイトルとウィンドウ設定
     page.title = "TODOアプリ"
@@ -13,33 +13,34 @@ def main(page: ft.Page):
     page.window.left = 100
     page.window.width = 500
     page.window.height = 700
-    page.window.minimizable = False
-    page.window.maximizable = False
-    page.window.resizable = False
-    page.bgcolor = settings.main_bg_color
+    page.bgcolor = app_setting.main_bg_color
 
     # 時計スレッドを一度だけ起動
-    settings.start_clock_thread()
+    app_setting.start_clock_thread()
 
+    # ナビゲーションバー用の画面遷移コード
     def render(index):
         page.clean()
         if index == 0:
-            page.add(todo_screen(page, settings))
+            page.add(todo_screen(page, app_setting))
         elif index == 1:
-            page.add(achievements_screen(settings))
+            page.add(achievement_screen(app_setting))
         elif index == 2:
-            page.add(setting_screen(page, settings))
+            page.add(setting_screen(page, app_setting,on_setting_changed))
 
-    def on_settings_changed():
+    # ナビゲーションバーの番号の取得
+    def on_setting_changed():
         render(page.navigation_bar.selected_index)
 
+    # ナビゲーションバーのクリック時処理
     def change_screen(e):
         render(e.control.selected_index)
 
+    # ナビゲーションバーのレイアウト
     page.navigation_bar = ft.NavigationBar(
         destinations=[
             ft.NavigationBarDestination(icon=ft.Icons.CHECK_BOX, label="TODO"),
-            ft.NavigationBarDestination(icon=ft.Icons.STAR, label="ACHIEVEMENTS"),
+            ft.NavigationBarDestination(icon=ft.Icons.STAR, label="ACHIEVEMENT"),
             ft.NavigationBarDestination(icon=ft.Icons.SETTINGS, label="SETTING"),
         ],
         on_change=change_screen

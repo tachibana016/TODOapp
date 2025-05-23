@@ -1,57 +1,17 @@
 [
     {
+        "text": "ご飯",
+        "completed": true,
+        "completed_date": "2025-05-23-11-01-47"
+    },
+    {
         "text": "掃除",
         "completed": true,
-        "completed_date": "2025-05-20"
+        "completed_date": "2025-05-23-11-01-46"
     },
     {
-        "text": "洗濯",
+        "text": "睡眠",
         "completed": true,
-        "completed_date": "2025-05-20"
-    },
-    {
-        "text": "qww",
-        "completed": true,
-        "completed_date": "2025-05-22"
-    },
-    {
-        "text": "mo",
-        "completed": true,
-        "completed_date": "2025-05-22"
-    },
-    {
-        "text": "ni",
-        "completed": true,
-        "completed_date": "2025-05-22"
-    },
-    {
-        "text": "yuyuyu",
-        "completed": true,
-        "completed_date": "2025-05-22"
-    },
-    {
-        "text": "ware",
-        "completed": true,
-        "completed_date": "2025-05-22"
-    },
-    {
-        "text": "ところがぎっちょん",
-        "completed": true,
-        "completed_date": "2025-05-22"
-    },
-    {
-        "text": "同じ穴の狢がよ",
-        "completed": true,
-        "completed_date": "2025-05-22"
-    },
-    {
-        "text": "戦争根絶を願ったテロリストどもが",
-        "completed": true,
-        "completed_date": "2025-05-22"
-    },
-    {
-        "text": "nifnifsf",
-        "completed": true,
-        "completed_date": "2025-05-23"
+        "completed_date": "2025-05-23-11-01-48"
     }
 ]
