@@ -12,7 +12,7 @@ class App_Setting:
         self.text_color = "black"
         self.text_size = 16
         self.text_font = "Noto Sans JP"
-        self.sort_ascending = True
+        self.sort_ascending = False
 
         # Textオブジェクトとして初期化（あとで画面に追加）
         self.clock_text = ft.Text("")

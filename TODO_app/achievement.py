@@ -43,7 +43,7 @@ def achievement_screen(app_setting):
         # 達成日に合わせてソート
         completed.sort(key=lambda x: x.get("completed_date", ""), reverse=not app_setting.sort_ascending)
         achievement_list.controls.clear()
-            
+
 
         for todo in completed:
             completed_date_raw = todo.get('completed_date', '')

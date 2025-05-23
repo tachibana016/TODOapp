@@ -16,7 +16,8 @@
     },
     {
         "text": "Python　課題",
-        "completed": false
+        "completed": true,
+        "completed_date": "2025-05-23-13-52-25"
     },
     {
         "text": "チーム制作　資料作り",

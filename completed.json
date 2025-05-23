@@ -7,11 +7,16 @@
     {
         "text": "掃除",
         "completed": true,
-        "completed_date": "2025-05-23-11-01-46"
+        "completed_date": "2025-05-23-11-01-47"
     },
     {
         "text": "睡眠",
         "completed": true,
         "completed_date": "2025-05-23-11-01-48"
+    },
+    {
+        "text": "Python　課題",
+        "completed": true,
+        "completed_date": "2025-05-23-13-52-25"
     }
 ]
